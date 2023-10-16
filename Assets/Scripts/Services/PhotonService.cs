@@ -33,12 +33,12 @@ namespace STamMultiplayerTestTak.Services
             PhotonNetwork.ConnectUsingSettings();
 
             var breakDate = DateTime.Now + TimeSpan.FromSeconds(_gameSetup.serverTimeOut);
-            while (!IsConnectedToServer || DateTime.Now <= breakDate)
+            while (!IsConnectedToServer && DateTime.Now <= breakDate)
             {
                 await Task.Yield();
             }
         }
-
+        
         public async UniTask<bool> TryCreateRoomAsync(string name)
         {
             if (!IsConnectedToServer) return false;
@@ -52,28 +52,34 @@ namespace STamMultiplayerTestTak.Services
             PhotonNetwork.CreateRoom(name, roomOption);
 
             var breakDate = DateTime.Now + TimeSpan.FromSeconds(_gameSetup.serverTimeOut);
-            while (PhotonNetwork.CurrentRoom == null || PhotonNetwork.CurrentRoom.Name != name || DateTime.Now <= breakDate)
+            while (PhotonNetwork.CurrentRoom == null && DateTime.Now <= breakDate)
             {
                 await Task.Yield();
             }
-            
-            return true;
+
+            return PhotonNetwork.CurrentRoom != null && DateTime.Now <= breakDate;
         }
 
         public async UniTask JoinToRoomAsync(string name)
         {
-            if (!IsConnectedToServer || PhotonNetwork.CurrentRoom == null) return;
-
+            if (!IsConnectedToServer) return;
+            
             if (!PhotonNetwork.IsMasterClient)
                 PhotonNetwork.JoinRoom(name);
             
-            while (IsConnectedToServer && PhotonNetwork.CurrentRoom.PlayerCount < _gameSetup.minimumPlayersForStartGame)
+
+            while (PhotonNetwork.CurrentRoom == null || IsConnectedToServer && PhotonNetwork.CurrentRoom.PlayerCount < _gameSetup.minimumPlayersForStartGame)
             {
                 await Task.Yield();
             }
             
             if (PhotonNetwork.CurrentRoom.PlayerCount >= _gameSetup.minimumPlayersForStartGame)
                 PhotonNetwork.LoadLevel("Game");
+        }
+
+        public override void OnConnectedToMaster()
+        {
+            PhotonNetwork.JoinLobby();
         }
 
         public override void OnRoomListUpdate(List<RoomInfo> roomList)

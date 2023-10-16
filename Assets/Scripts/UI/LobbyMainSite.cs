@@ -84,14 +84,16 @@ namespace STamMultiplayerTestTak.UI
                         JoinToRoom(name);
                     }
                     else
+                    {
+                        screen.HideSplashScreen();
                         screen.ShowMessageBox<InfoMsgBox, string>("ROOM NOT CREATED !!");
+                    }
                 })
                 ;
         }
 
         private void RefreshRoomList(List<RoomInfo> roomList)
         {
-            Debug.Log("RefreshRoomList");
             foreach (var room in _rooms)
             {
                 Destroy(room);
@@ -130,6 +132,7 @@ namespace STamMultiplayerTestTak.UI
         {
             _screen.ShowSplashScreen<AwaitOtherPlayerSplashScreen>();
             await _photonService.JoinToRoomAsync(roomName);
+            _screen.HideSplashScreen();
         }
     }
 }

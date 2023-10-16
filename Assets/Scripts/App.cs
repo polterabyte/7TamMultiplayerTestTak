@@ -16,7 +16,7 @@ namespace STamMultiplayerTestTak
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
         private static void Initialize()
         {
-            //SystemSetups();
+            SystemSetups();
 #if UNITY_EDITOR
             SceneManager.LoadScene("Loading");
 #endif
@@ -24,7 +24,8 @@ namespace STamMultiplayerTestTak
 
         static void SystemSetups()
         {
-            Screen.SetResolution(1080, 1920, true);
+            //Screen.SetResolution(1080, 1920, true);
+            Screen.orientation = ScreenOrientation.LandscapeLeft;
             Application.targetFrameRate = -1;
             Time.fixedDeltaTime = 1 / 32f;
         }
