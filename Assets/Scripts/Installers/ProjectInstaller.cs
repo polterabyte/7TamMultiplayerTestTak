@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using STamMultiplayerTestTak.Services;
+using UnityEngine;
 using Zenject;
 
 namespace STamMultiplayerTestTak.Installers
@@ -7,7 +8,7 @@ namespace STamMultiplayerTestTak.Installers
     {
         public override void InstallBindings()
         {
-            Debug.Log("!");
+            Container.BindInterfacesTo<PhotonService>().FromNewComponentOn(gameObject).AsSingle();
         }
     }
 }
