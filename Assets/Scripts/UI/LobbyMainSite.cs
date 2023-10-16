@@ -11,6 +11,7 @@ using Photon.Pun;
 using STamMultiplayerTestTak.Services;
 using TMPro;
 using Zenject;
+using Screen = STamMultiplayerTestTak.Package.UI.Screen;
 
 namespace STamMultiplayerTestTak.UI
 {
@@ -23,27 +24,39 @@ namespace STamMultiplayerTestTak.UI
 
         private List<RoomItemView> _rooms = new();
         private IPhotonService _photonService;
+        private Screen _screen;
         
         public bool IsShow => gameObject.activeSelf;
         public void Show()
         {
-            
+            gameObject.SetActive(true);
         }
 
         public void Hide()
         {
-            
+            gameObject.SetActive(false);
         }
 
         [Inject]
-        private void Construct(IPhotonService photonService)
+        private void Construct(IPhotonService photonService, Screen screen)
         {
             _photonService = photonService;
+            _screen = screen;
 
             var ct = gameObject.GetCancellationTokenOnDestroy();
             UniTaskAsyncEnumerable
                 .EveryValueChanged(_photonService, service => service.Rooms)
                 .Subscribe(RefreshRoomList)
+                .AddTo(ct)
+                ;
+            
+            UniTaskAsyncEnumerable
+                .EveryValueChanged(_photonService, service => service.IsConnectedToServer)
+                .Subscribe(async b =>
+                {
+                    if (b) return;
+                    await Reconnect();
+                })
                 .AddTo(ct)
                 ;
 
@@ -61,9 +74,17 @@ namespace STamMultiplayerTestTak.UI
             btCreateRoom.interactable = false;
             btCreateRoom
                 .OnClickAsAsyncEnumerable(ct)
-                .Subscribe(_ =>
+                .Subscribe(async _=>
                 {
-                    _photonService.TryCreateRoom(roomName.text);
+                    var name = roomName.text;
+                    screen.ShowSplashScreen<AwaitCreateRoomSplashScreen>();
+                    var result = await _photonService.TryCreateRoomAsync(name);
+                    if (result)
+                    {
+                        JoinToRoom(name);
+                    }
+                    else
+                        screen.ShowMessageBox<InfoMsgBox, string>("ROOM NOT CREATED !!");
                 })
                 ;
         }
@@ -82,8 +103,33 @@ namespace STamMultiplayerTestTak.UI
             {
                 var roomView = Instantiate(roomItemViewPrefab, roomItemViewContainer);
                 
-                roomView.Init(room);
+                roomView.Init(room, () => JoinToRoom(room.Name));
             }
+        }
+
+        private async UniTask Reconnect()
+        {
+            _screen.HideSplashScreen();
+            var result = await _screen.ShowMessageBoxAsync<ReconnectMsgBox, bool>();
+            if (result)
+            {
+                _screen.ShowSplashScreen<AwaitConnectingSplashScreen>();
+                await _photonService.ConnectedToServerAsync();
+                _screen.HideSplashScreen();
+
+                if (!_photonService.IsConnectedToServer)
+                    await Reconnect();
+            }
+            else
+            {
+                App.Quit();
+            }
+        }
+
+        private async void JoinToRoom(string roomName)
+        {
+            _screen.ShowSplashScreen<AwaitOtherPlayerSplashScreen>();
+            await _photonService.JoinToRoomAsync(roomName);
         }
     }
 }

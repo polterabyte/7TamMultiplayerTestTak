@@ -46,13 +46,7 @@ namespace STamMultiplayerTestTak.UI
             await Task.Delay(100);
             
             info.text = "Connect to server";
-            _photonService.ConnectedToServer();
-
-            var breakDate = DateTime.Now + TimeSpan.FromSeconds(10);
-            while (!_photonService.IsConnectedToServer || DateTime.Now <= breakDate)
-            {
-                await Task.Yield();
-            }
+            await _photonService.ConnectedToServerAsync();
             progressBar.value = 1f;
 
             SceneManager.LoadSceneAsync("Lobby");

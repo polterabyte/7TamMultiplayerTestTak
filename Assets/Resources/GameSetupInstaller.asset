@@ -12,3 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 158b7ee2e357eb2489e1545f55e8a729, type: 3}
   m_Name: GameSetupInstaller
   m_EditorClassIdentifier: 
+  gameSetup:
+    version: 1
+    maxPlayerInRoom: 5
+    serverTimeOut: 10
+    minimumPlayersForStartGame: 2

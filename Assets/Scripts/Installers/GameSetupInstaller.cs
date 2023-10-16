@@ -11,6 +11,7 @@ namespace STamMultiplayerTestTak.Installers
         
         public override void InstallBindings()
         {
+            Container.BindInstance(gameSetup);
         }
     }
 
@@ -18,5 +19,8 @@ namespace STamMultiplayerTestTak.Installers
     public class GameSetup
     {
         public int version;
+        public int maxPlayerInRoom = 5;
+        public int serverTimeOut = 10;
+        public int minimumPlayersForStartGame = 2;
     }
 }

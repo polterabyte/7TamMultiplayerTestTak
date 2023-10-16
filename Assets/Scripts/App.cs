@@ -28,6 +28,11 @@ namespace STamMultiplayerTestTak
             Application.targetFrameRate = -1;
             Time.fixedDeltaTime = 1 / 32f;
         }
+
+        public static void Quit()
+        {
+            Application.Quit();
+        }
     }
 
 }

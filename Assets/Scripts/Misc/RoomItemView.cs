@@ -14,7 +14,7 @@ namespace STamMultiplayerTestTak.Misc
         [SerializeField] private TMP_Text roomName;
         [SerializeField] private TMP_Text roomInfo;
 
-        public void Init(RoomInfo room)
+        public void Init(RoomInfo room, Action join)
         {
             roomName.text = room.Name;
             roomInfo.text = $"{room.PlayerCount} / {room.MaxPlayers}";
@@ -23,7 +23,7 @@ namespace STamMultiplayerTestTak.Misc
                 .OnClickAsAsyncEnumerable()
                 .Subscribe(_ =>
                 {
-
+                    join?.Invoke();
                 })
                 .AddTo(gameObject.GetCancellationTokenOnDestroy())
                 ;
