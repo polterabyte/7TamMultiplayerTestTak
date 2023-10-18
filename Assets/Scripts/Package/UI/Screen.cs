@@ -25,12 +25,13 @@ namespace STamMultiplayerTestTak.Package.UI
             _popups = popups;
             _sites = sites;
 
-            if (_sites.Count(x => x.IsShow) != 1)
+            if (_sites.Count(x => x.IsShow) > 1)
                 throw new Exception("Стартовая страница должна быть одна !");
             
-            var mainSite = _sites.First(x => x.IsShow);
+            var mainSite = _sites.FirstOrDefault(x => x.IsShow);
             _callSiteStack = new Stack<KeyValuePair<ISite, ISite>>();
-            _callSiteStack.Push(new KeyValuePair<ISite, ISite>(null, mainSite));
+            if (mainSite != null)
+                _callSiteStack.Push(new KeyValuePair<ISite, ISite>(null, mainSite));
             
             _callMessageBoxesStack = new Stack<KeyValuePair<IPopup, IPopup>>();
         }

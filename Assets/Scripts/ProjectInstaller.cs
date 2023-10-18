@@ -1,8 +1,7 @@
 ﻿using STamMultiplayerTestTak.Services;
-using UnityEngine;
 using Zenject;
 
-namespace STamMultiplayerTestTak.Installers
+namespace STamMultiplayerTestTak
 {
     public class ProjectInstaller : MonoInstaller<ProjectInstaller>
     {

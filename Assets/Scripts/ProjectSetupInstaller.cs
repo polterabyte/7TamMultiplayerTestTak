@@ -2,10 +2,10 @@ using System;
 using UnityEngine;
 using Zenject;
 
-namespace STamMultiplayerTestTak.Installers
+namespace STamMultiplayerTestTak
 {
     [CreateAssetMenu(fileName = "GameSetupInstaller", menuName = "STamMultiplayerTestTak/Installers/GameSetupInstaller")]
-    public class GameSetupInstaller : ScriptableObjectInstaller<GameSetupInstaller>
+    public class ProjectSetupInstaller : ScriptableObjectInstaller<ProjectSetupInstaller>
     {
         [SerializeField] private GameSetup gameSetup;
         
@@ -22,5 +22,10 @@ namespace STamMultiplayerTestTak.Installers
         public int maxPlayerInRoom = 5;
         public int serverTimeOut = 10;
         public int minimumPlayersForStartGame = 2;
+        public int playerHeals = 100;
+        public int coinsCount = 100;
+        public string playerPrefabName = "Player";
+        public string coinPrefabName = "Coin";
+        public string bulletPrefabName = "Bullet";
     }
 }

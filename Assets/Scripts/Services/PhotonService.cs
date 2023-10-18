@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Photon.Pun;
 using Photon.Realtime;
-using STamMultiplayerTestTak.Installers;
 using UnityEngine;
 using Zenject;
 
@@ -13,9 +12,11 @@ namespace STamMultiplayerTestTak.Services
 {
     public class PhotonService : MonoBehaviourPunCallbacks, IPhotonService
     {
-
+        public bool IsMasterClient => PhotonNetwork.IsMasterClient;
         public bool IsConnectedToServer => PhotonNetwork.IsConnected;
         public List<RoomInfo> Rooms { get; private set; } = new();
+        public Photon.Realtime.Player LocalPlayer => PhotonNetwork.LocalPlayer;
+        public Photon.Realtime.Player[] OtherPlayers => PhotonNetwork.PlayerListOthers;
 
         private GameSetup _gameSetup;
         
@@ -77,6 +78,19 @@ namespace STamMultiplayerTestTak.Services
                 PhotonNetwork.LoadLevel("Game");
         }
 
+        public GameObject InstantiatePlayer()
+        {
+            return PhotonNetwork.Instantiate(_gameSetup.playerPrefabName, Vector3.zero, Quaternion.identity);
+        }
+        public GameObject InstantiateCoin()
+        {
+            return PhotonNetwork.Instantiate(_gameSetup.coinPrefabName, Vector3.zero, Quaternion.identity);
+        }
+        public GameObject InstantiateBullet()
+        {
+            return PhotonNetwork.Instantiate(_gameSetup.bulletPrefabName, Vector3.zero, Quaternion.identity);
+        }
+
         public override void OnConnectedToMaster()
         {
             PhotonNetwork.JoinLobby();
@@ -84,7 +98,7 @@ namespace STamMultiplayerTestTak.Services
 
         public override void OnRoomListUpdate(List<RoomInfo> roomList)
         {
-            Rooms = roomList;
+            Rooms = roomList; 
         }
     }
 }
