@@ -1,81 +1,92 @@
 ﻿using System;
 using System.Collections.Generic;
-using ExitGames.Client.Photon;
+using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks.Linq;
 using Photon.Pun;
-using Photon.Realtime;
-using STamMultiplayerTestTak.Services;
 using UnityEngine;
+using UnityEngine.Assertions;
 using Zenject;
-using Object = UnityEngine.Object;
 
 namespace STamMultiplayerTestTak.Entities.Player
 {
     public class PlayerFacade : IDisposable
     {
+        private readonly GameSetup _gameSetup;
+        private readonly DamageHandler _damageHandler;
+        private readonly CoinHandler _coinHandler;
+        private readonly Transform _transform;
+        private readonly SpriteRenderer _spriteRenderer;
         public int Heals => _damageHandler.heals;
         public int Coins => _coinHandler.coins;
-        
-        [Inject] private DamageHandler _damageHandler;
-        [Inject] private CoinHandler _coinHandler;
-        [Inject] private Transform _transform;
-        [Inject] private PhotonView _photonView;
-        
-        public class Factory : PlaceholderFactory<Vector3, Quaternion, Transform, int, PlayerFacade>
+        public Color Color
         {
-            public override PlayerFacade Create(Vector3 param1, Quaternion param2, Transform param3, int param4)
-            {
-                //var facade = base.Create(param1, param2, param3, param4);
-                var facade = base.CreateInternal(new List<TypeValuePair>());
+            get => _spriteRenderer.color;
+            set => _spriteRenderer.color = value;
+        }
+
+
+        private List<IDisposable> _disposables = new();
+
+        private Color _initColor;
+        private bool _blinkFlag;
+
+        public PlayerFacade(
+            GameSetup gameSetup, 
+            DamageHandler damageHandler, 
+            CoinHandler coinHandler, 
+            Transform transform, 
+            SpriteRenderer spriteRenderer
+            )
+        {
+            _gameSetup = gameSetup;
+            _damageHandler = damageHandler;
+            _coinHandler = coinHandler;
+            _transform = transform;
+            _spriteRenderer = spriteRenderer;
             
-                facade._transform.position = param1;
-                facade._transform.rotation = param2;
-                facade._transform.SetParent(param3);
-            
-                //https://doc.photonengine.com/pun/current/gameplay/instantiation#manual_instantiation
-                #region Manual Instantiation
-                
-                if (param4 == -1)
-                {
-                    if (PhotonNetwork.AllocateViewID(facade._photonView))
+            _initColor = _spriteRenderer.color;
+
+            var a = UniTaskAsyncEnumerable
+                    .EveryValueChanged(this, facade => facade.Heals)
+                    .Subscribe(i =>
                     {
-                        param4 = facade._photonView.ViewID;
-                        var data = new object[]
+                        if (i > 0)
                         {
-                            param1, param2, param4
-                        };
-            
-                        var raiseEventOptions = new RaiseEventOptions
-                        {
-                            Receivers = ReceiverGroup.Others,
-                            CachingOption = EventCaching.AddToRoomCache
-                        };
-            
-                        var sendOptions = new SendOptions
-                        {
-                            Reliability = true
-                        };
-            
-                        PhotonNetwork.RaiseEvent((byte)IPhotonService.Events.OnPlayerAddToRoom, data, raiseEventOptions, sendOptions);
-                    }
-                    else
+                            Blink();
+                            Debug.Log($"HEALS {i}");
+                        }
+                    })
+                ;
+            var b = UniTaskAsyncEnumerable
+                    .EveryValueChanged(this, facade => facade.Coins)
+                    .Subscribe(i =>
                     {
-                        Debug.LogError("Failed to allocate a ViewId.");
-            
-                        //Destroy(player);
-                    }
-                }
-                
-                facade._photonView.ViewID = param4;
-            
-                #endregion
-                
-                return facade;
-            }
+                        // TODO !!!!!
+                        if (i > _gameSetup.coinsCountOnSession)
+                        {
+                            Debug.Log($"COINS {i}");
+                        }
+                    })
+                ;
+
+            _disposables.AddRange(new[] { a, b });
+        }
+
+        private async void Blink()
+        {
+            _spriteRenderer.color = Color.red;
+            await UniTask.Delay(300);
+            _spriteRenderer.color = _initColor;
         }
 
         public void Dispose()
         {
-            Object.Destroy(_transform.gameObject);
+            _disposables.ForEach(x=> x.Dispose());
+            PhotonNetwork.Destroy(_transform.gameObject);
+        }
+        
+        public class Factory : PlaceholderFactory<GameObject, PlayerFacade>
+        {
         }
     }
 }

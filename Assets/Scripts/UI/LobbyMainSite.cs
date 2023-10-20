@@ -2,7 +2,6 @@
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
-using STamMultiplayerTestTak.Misc;
 using STamMultiplayerTestTak.Package.UI;
 using UnityEngine;
 using UnityEngine.UI;

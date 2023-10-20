@@ -97,11 +97,14 @@ GameObject:
   - component: {fileID: 3201924438456446960}
   - component: {fileID: 5864775969048731854}
   - component: {fileID: 3659553374160845746}
-  - component: {fileID: 4645296645185863973}
   - component: {fileID: -1563605001050563110}
   - component: {fileID: 3336329992058459626}
   - component: {fileID: -1652819408998059900}
   - component: {fileID: 5425926903438939695}
+  - component: {fileID: 4645296645185863973}
+  - component: {fileID: 5309452930660992920}
+  - component: {fileID: 9188110603382954625}
+  - component: {fileID: 2142036568805944691}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -185,19 +188,19 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3760310091347492343}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
+  m_UseAutoMass: 1
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 0
+  m_CollisionDetection: 1
+  m_Constraints: 4
 --- !u!61 &3659553374160845746
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -208,7 +211,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -224,19 +227,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &4645296645185863973
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3760310091347492343}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8eb3fc6afa684910bada857308c9e250, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gun: {fileID: 2982721818421424250}
 --- !u!114 &-1563605001050563110
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -258,6 +248,7 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 3336329992058459626}
   - {fileID: -1652819408998059900}
+  - {fileID: 5425926903438939695}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -305,6 +296,60 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec89b744506c49d7a68845f56f59ca1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4645296645185863973
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3760310091347492343}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8eb3fc6afa684910bada857308c9e250, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  reloadTimeSec: 0.5
+  gun: {fileID: 2982721818421424250}
+--- !u!114 &5309452930660992920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3760310091347492343}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 556533e4ece7466591ddd683854b32c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  heals: 0
+--- !u!114 &9188110603382954625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3760310091347492343}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2798aaa4fdce4da4b623125b69e0bcf7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  coins: 0
+--- !u!114 &2142036568805944691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3760310091347492343}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b76f46602294c6fb614cfc5cd0e512f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  kMove: 6
+  kRotate: 120
 --- !u!1 &5021444802313480484
 GameObject:
   m_ObjectHideFlags: 0

@@ -11,13 +11,8 @@ namespace STamMultiplayerTestTak.Entities
 {
     public class Coin : MonoBehaviour, IDisposable
     {
-        private PhotonView _photonView;
-
-        [Inject]
-        private void Construct()
+        private void Awake()
         {
-            _photonView = PhotonView.Get(gameObject);
-            
             var ct = gameObject.GetCancellationTokenOnDestroy();
             gameObject
                 .GetAsyncTriggerEnter2DTrigger()
@@ -33,20 +28,8 @@ namespace STamMultiplayerTestTak.Entities
         }
         public void Dispose()
         {
-            if (_photonView.IsMine)
-                DisposeRPCCommand();
-            else
-            {
-                //_photonView.RPC(nameof(DisposeRPCCommand), RpcTarget.MasterClient);
-            }
-        }
-
-        //[PunRPC]
-        private void DisposeRPCCommand()
-        {
             PhotonNetwork.Destroy(gameObject);
         }
-        
         public class Factory : PlaceholderFactory<Vector3, Coin>
         { }
     }

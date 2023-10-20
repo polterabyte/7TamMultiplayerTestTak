@@ -6,7 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace STamMultiplayerTestTak.Misc
+namespace STamMultiplayerTestTak.UI
 {
     public class RoomItemView : MonoBehaviour
     {

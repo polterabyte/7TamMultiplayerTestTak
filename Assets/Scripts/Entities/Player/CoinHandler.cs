@@ -9,9 +9,9 @@ namespace STamMultiplayerTestTak.Entities.Player
 
         public void TakeCoin(int coin)
         {
-            Debug.Log("COINS");
-
             coins = Math.Clamp(coins + coin, 0, int.MaxValue);
         }
+
+
     }
 }

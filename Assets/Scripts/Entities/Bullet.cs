@@ -2,6 +2,7 @@
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using Cysharp.Threading.Tasks.Triggers;
+using Photon.Pun;
 using STamMultiplayerTestTak.Entities.Player;
 using STamMultiplayerTestTak.Services;
 using UnityEngine;
@@ -9,66 +10,57 @@ using Zenject;
 
 namespace STamMultiplayerTestTak.Entities
 {
-    public class Bullet : MonoBehaviour, IPoolable<Vector3, IMemoryPool>, IDisposable
+    public class Bullet : MonoBehaviour, IDisposable
     {
         [SerializeField] private int kSpeed = 5;
         public int damage = 5;
-        
-        private IMemoryPool _memoryPool;
-        private Vector3 _dir;
 
-        private CameraService _cameraService;
-        
-        [Inject]
-        private void Construct(CameraService cameraService)
+        public Vector3 direction;
+        //private CameraService _cameraService;
+        //private PhotonView _photonView;
+
+        private void Awake()
         {
-            _cameraService = cameraService;
-            
+            //_photonView = PhotonView.Get(gameObject);
+
+            var rb = GetComponent<Rigidbody2D>();
             var ct = gameObject.GetCancellationTokenOnDestroy();
 
             gameObject.GetAsyncUpdateTrigger().Subscribe(_ =>
                 {
-                    transform.position += _dir * (Time.deltaTime * kSpeed);
+                    var dir = new Vector2() { x = direction.x, y = direction.y };
+                    rb.velocity = dir * kSpeed;
+                    //transform.position += direction * (Time.deltaTime * kSpeed);
 
-                    if (!_cameraService.CheckVisibility(transform.position))
-                        Dispose();
+                    // if (!_cameraService.CheckVisibility(transform.position))
+                    //     Dispose();
                 })
                 .AddTo(ct)
                 ;
             
             gameObject
-                .GetAsyncTriggerEnter2DTrigger()
-                .Where(x=> x.GetComponent<DamageHandler>() != null)
-                .Select(collision2D => collision2D.gameObject.GetComponent<DamageHandler>())
-                .Subscribe(handler =>
+                .GetAsyncCollisionEnter2DTrigger()
+                //.Where(x=> x.gameObject.GetComponent<DamageHandler>() != null)
+                //.Select(collision2D => collision2D.gameObject.GetComponent<DamageHandler>())
+                .Subscribe(c =>
                 {
-                    handler.TakeDamage(damage);
+                    if (c.gameObject.GetComponent<DamageHandler>() != null)
+                        c.gameObject.GetComponent<DamageHandler>().TakeDamage(damage);
+                    
                     Dispose();
                 })
                 .AddTo(ct)
                 ;
             
         }
-        
-        public void OnDespawned()
-        {
-            _memoryPool = null;
-        }
-
-        public void OnSpawned(Vector3 p1, IMemoryPool p2)
-        {
-            _dir = p1;
-            _memoryPool = p2;
-        }
 
         public void Dispose()
         {
-            _memoryPool?.Despawn(this);
+            PhotonNetwork.Destroy(gameObject);
         }
 
-        public class Factory : PlaceholderFactory<Vector3, Bullet>
+        public class Factory : PlaceholderFactory<Vector3, Vector3, Bullet>
         {
-            
         }
     }
 }

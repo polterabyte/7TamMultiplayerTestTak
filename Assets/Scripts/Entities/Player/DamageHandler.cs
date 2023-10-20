@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 using Zenject;
 
@@ -8,6 +9,8 @@ namespace STamMultiplayerTestTak.Entities.Player
     {
         public int heals;
         
+        private SpriteRenderer _sprite;
+
         [Inject]
         private void Construct(GameSetup gameSetup)
         {
@@ -16,8 +19,6 @@ namespace STamMultiplayerTestTak.Entities.Player
         
         public void TakeDamage(int damage)
         {
-            Debug.Log("DAMAGE");
-
             heals = Math.Clamp(heals - damage, 0, int.MaxValue);
         }
     }

@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Zenject;
 
 namespace STamMultiplayerTestTak
@@ -23,7 +24,7 @@ namespace STamMultiplayerTestTak
         public int serverTimeOut = 10;
         public int minimumPlayersForStartGame = 2;
         public int playerHeals = 100;
-        public int coinsCount = 100;
+        public int coinsCountOnSession = 100;
         public string playerPrefabName = "Player";
         public string coinPrefabName = "Coin";
         public string bulletPrefabName = "Bullet";
