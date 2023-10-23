@@ -8,7 +8,7 @@
 
 - [<img src="https://assets-global.website-files.com/61c5bae4f8220d4cf7cb9ffd/61e14de57fdbdfc33c384089_unity.jpg" alt="Unity" width="300"/>](https://unity.com/releases/editor/whats-new/2021.3.9)
 - [<img src="https://assetstorev1-prd-cdn.unity3d.com/key-image/fb473d32-4ded-4188-9ed9-76e77b4072bc.webp" alt="Photon" width="300"/>](https://assetstore.unity.com/packages/tools/network/pun-2-free-119922)
-- [<img src="image.png" alt="Unitak" width="200"/>](https://github.com/Cysharp/UniTask?ysclid=lo34m82736575792976#unitask)
+- [<img src="image.png" alt="Unitak" width="300"/>](https://github.com/Cysharp/UniTask?ysclid=lo34m82736575792976#unitask)
 - [<img src="https://github.com/modesttree/Zenject/blob/master/Documentation/Images/PNG_Zenject-colour%20(1).png?raw=true" alt="Zenject" width="300"/>](https://github.com/modesttree/Zenject/tree/master)
 
 ## Описание игорового процесса
@@ -34,5 +34,5 @@
 шкала здоровья уменьшается
 - Игроки визуально отличатся друг от друга (цвет изображение)
 - Игра заканчивается, когда в живых останется 1 игрок или все монеты собраны. 
-  После этого появляется победный pop-up с информацией, где указаны имя
+  После этого появляется победный pop-up с информацией, где указаны номер
   победителя и сколько монет он собрал.
