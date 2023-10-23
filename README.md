@@ -4,7 +4,7 @@
 устройств смогут зайти в лобби.
 
 
-## Используемые технологии
+## Используемые библиотеки и технологии
 
 - [<img src="https://assets-global.website-files.com/61c5bae4f8220d4cf7cb9ffd/61e14de57fdbdfc33c384089_unity.jpg" alt="Unity" width="300"/>](https://unity.com/releases/editor/whats-new/2021.3.9)
 - [<img src="https://assetstorev1-prd-cdn.unity3d.com/key-image/fb473d32-4ded-4188-9ed9-76e77b4072bc.webp" alt="Photon" width="300"/>](https://assetstore.unity.com/packages/tools/network/pun-2-free-119922)

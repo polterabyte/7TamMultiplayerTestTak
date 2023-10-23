@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using STamMultiplayerTestTak.GameClientServer.Level;
@@ -53,7 +54,7 @@ namespace STamMultiplayerTestTak.UI
 
         private async void ExitAsync()
         {
-            await _screen.ShowMessageBoxAsync<InfoMsgBox, string>($"WINNER PLAYER NUM {_level.PlayerWinActorNum}");
+            await _screen.ShowMessageBoxAsync<InfoMsgBox, string>($"WINNER PLAYER NUM {_level.PlayerWinActorNum}\n COLLECTED {_level.Players.First(x=> x.ActorNum == _level.PlayerWinActorNum).Coins} COINS");
             
             App.Quit();
         }

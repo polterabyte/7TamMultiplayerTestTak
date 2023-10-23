@@ -63,7 +63,6 @@ namespace STamMultiplayerTestTak.GameClientServer.Level
         {
             var size = area.size;
             var zero = area.offset - size / 2;
-
             var rect = new Rect(zero, size);
 
             for (var i = 0; i < coinsCount; i++)
@@ -74,7 +73,13 @@ namespace STamMultiplayerTestTak.GameClientServer.Level
                     y = Random.Range(-rect.y, rect.y),
                 };
 
-                if (saveArea.All(x => !x.OverlapPoint(pos)))
+                if (saveArea.All(x =>
+                    {
+                        var s = x.size;
+                        var z = x.offset - s / 2;
+                        var r = new Rect(z, s);
+                        return !r.Contains(pos);
+                    }))
                     _coinMemoryPool.Spawn(pos);
                 else
                     i--;
