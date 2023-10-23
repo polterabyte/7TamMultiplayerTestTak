@@ -3,8 +3,7 @@
 2D игрa для Android на Unity, где 2 и более игроков с разных Android 
 устройств смогут сражаться между собой, собирая монеты.
 
-<img src="7tam task.gif" alt="My Project GIF" width="500" height="400">
-
+<img src="7Tam task.gif" width="690" height="388" alt="gif">
 
 ## Используемые библиотеки и технологии
 
