@@ -8,11 +8,11 @@ using UnityEngine;
 
 namespace STamMultiplayerTestTak.GameClientServer.Server
 {
-    public abstract class BaseGameServer : IServer, IDisposable, IOnEventCallback
+    public abstract class BaseGameServer : IDisposable, IOnEventCallback
     {
         protected readonly IPhotonService PhotonService;
         protected readonly GameSetup GameSetup;
-        protected readonly LevelFacade Level;
+        protected readonly ILevel Level;
         protected BaseGameServer(IPhotonService photonService, LevelFacade.Factory leveFactory, GameSetup gameSetup)
         {
             PhotonService = photonService;

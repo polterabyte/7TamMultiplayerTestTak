@@ -5,15 +5,15 @@ using Photon.Realtime;
 using STamMultiplayerTestTak.GameClientServer.Level;
 using STamMultiplayerTestTak.Services;
 
-namespace STamMultiplayerTestTak.Entities.Player
+namespace STamMultiplayerTestTak.GameClientServer.Level
 {
-    public class PlayerMatchStateObserver : IDisposable, IOnEventCallback
+    public class LevelMatchStateEventCallbackObserver : IDisposable, IOnEventCallback
     {
-        private readonly PlayerFacade _player;
+        private readonly ILevel _level;
 
-        public PlayerMatchStateObserver(PlayerFacade player)
+        public LevelMatchStateEventCallbackObserver(ILevel level)
         {
-            _player = player;
+            _level = level;
             
             PhotonNetwork.AddCallbackTarget(this);
         }
@@ -26,7 +26,10 @@ namespace STamMultiplayerTestTak.Entities.Player
 
                 if (Enum.TryParse(stateStr, out MatchStateEnum state))
                 {
-                    _player.IsEnableControl = state == MatchStateEnum.Run;
+                    _level.MatchState = state;
+
+                    if (state == MatchStateEnum.End)
+                        _level.PlayerWinActorNum = (int)data[1];
                 }
             }
         }

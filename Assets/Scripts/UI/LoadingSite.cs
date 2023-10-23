@@ -38,15 +38,19 @@ namespace STamMultiplayerTestTak.UI
         private async void LoadAsync()
         {
             info.text = "Fake loading operation 1";
-            progressBar.value = 0.33f;
+            progressBar.value = 0.25f;
             await Task.Delay(100);
             
             info.text = "Fake loading operation 2";
-            progressBar.value = 0.66f;
+            progressBar.value = 0.50f;
             await Task.Delay(100);
             
             info.text = "Connect to server";
             await _photonService.ConnectedToServerAsync();
+            progressBar.value = 0.75f;
+            
+            info.text = "Join to lobby";
+            await _photonService.JoinToLobbyAsync();
             progressBar.value = 1f;
 
             SceneManager.LoadSceneAsync("Lobby");

@@ -15,11 +15,11 @@ namespace STamMultiplayerTestTak.Entities.Player
         private PhotonView _photonView;
 
         [Inject]
-        private void Construct(int heal)
+        private void Construct(int heal, PhotonView photonView)
         {
             heals = heal;
             
-            _photonView = PhotonView.Get(gameObject);
+            _photonView = photonView;
         }
         
         public void TakeDamage(int damage)
@@ -32,7 +32,6 @@ namespace STamMultiplayerTestTak.Entities.Player
         [PunRPC]
         private void RPCTakeDamage(int damage)
         {
-            Debug.Log("RPCTakeDamage");
             heals = Math.Clamp(heals - damage, 0, int.MaxValue);
         }
     }

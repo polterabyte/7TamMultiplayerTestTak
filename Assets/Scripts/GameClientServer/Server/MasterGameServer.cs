@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExitGames.Client.Photon;
@@ -33,15 +34,37 @@ namespace STamMultiplayerTestTak.GameClientServer.Server
             
             PlacePlayer();
 
-            while (Level.Players.Count < GameSetup.minimumPlayersForStartGame && !token.IsCancellationRequested)
+            while (Level.Players.Count() < GameSetup.minimumPlayersForStartGame && !token.IsCancellationRequested)
             {
                 await Task.Yield();
             }
             
             Level.CreateCoins(GameSetup.coinsCountOnSession);
             
-            RiseEvent_OnStartMatch(MatchStateEnum.Run);
-            Level.Players.ForEach(x=> x.IsEnableControl = true);
+            RiseEvent_OnStartMatch();
+
+            AwaitGameComplete(token);
+        }
+
+        private async void AwaitGameComplete(CancellationToken token)
+        {
+            while (Level.Players.Count() > 1 &&
+                   Level.Players.All(x=> x.Coins < Level.TargetCoins) && 
+                   Level.Players.All(x=> x.Healths > 0) && 
+                   Level.AreCoins > 0 && 
+                   !token.IsCancellationRequested)
+            {
+                await Task.Yield();
+            }
+            
+            if (token.IsCancellationRequested)
+               Dispose();
+            else if (Level.Players.Count() == 1)
+                RiseEvent_OnEndMatch(Level.Players.First().ActorNum);
+            else if (Level.Players.Any(x=> x.Coins >= Level.TargetCoins))
+                RiseEvent_OnEndMatch(Level.Players.First(x=> x.Coins >= Level.TargetCoins).ActorNum);
+
+            RiseEvent_OnEndMatch(Level.Players.OrderByDescending(x=> x.Coins).First().ActorNum);
         }
 
         private void PlacePlayer()
@@ -51,7 +74,7 @@ namespace STamMultiplayerTestTak.GameClientServer.Server
             {
                 if (player.IsMasterClient)
                 {
-                    RiseEvent_OnInstallPlayer(Level.leftSpawn.position, Quaternion.identity, materColor, player.ActorNumber);
+                    RiseEvent_OnInstallPlayer(Level.SpawnPositions.First(), Quaternion.identity, materColor, player.ActorNumber);
                 }
                 else
                 {
@@ -62,23 +85,33 @@ namespace STamMultiplayerTestTak.GameClientServer.Server
                         color = Random.ColorHSV();
                     }
 
-                    RiseEvent_OnInstallPlayer(Level.rightSpawn.position, Quaternion.Euler(0, 0, 180), color, player.ActorNumber);
+                    RiseEvent_OnInstallPlayer(Level.SpawnPositions.Last(), Quaternion.Euler(0, 0, 180), color, player.ActorNumber);
                 }
             }
         }
 
         private static void RiseEvent_OnInstallPlayer(Vector3 pos, Quaternion rot, Color color, int actor)
         {
-            Debug.Log($"RiseEvent_OnInstallPlayer {pos} {rot}");
             var content = new object[] {pos, rot, color, actor }; 
             var options = new RaiseEventOptions { Receivers = ReceiverGroup.All };
             PhotonNetwork.RaiseEvent((byte)IPhotonService.Events.PlacePlayer, content, options, SendOptions.SendReliable);
         }
         
-        private static void RiseEvent_OnStartMatch(MatchStateEnum state)
+        private static void RiseEvent_OnStartMatch()
         {
-            Debug.Log($"RiseEvent_OnStartMatch");
-            var content = new object[] { state.ToString() };//{pos, rot, color, actor }; 
+            var content = new object[] { MatchStateEnum.Run.ToString()};
+            var options = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+            PhotonNetwork.RaiseEvent((byte)IPhotonService.Events.StartMatch, content, options, SendOptions.SendReliable);
+        }
+        private static void RiseEvent_OnPauseMatch()
+        {
+            var content = new object[] { MatchStateEnum.Pause.ToString()};
+            var options = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+            PhotonNetwork.RaiseEvent((byte)IPhotonService.Events.StartMatch, content, options, SendOptions.SendReliable);
+        }
+        private static void RiseEvent_OnEndMatch(int actorWin)
+        {
+            var content = new object[] { MatchStateEnum.End.ToString(), actorWin};
             var options = new RaiseEventOptions { Receivers = ReceiverGroup.All };
             PhotonNetwork.RaiseEvent((byte)IPhotonService.Events.StartMatch, content, options, SendOptions.SendReliable);
         }

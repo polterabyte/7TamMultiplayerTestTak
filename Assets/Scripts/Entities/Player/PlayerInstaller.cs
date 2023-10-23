@@ -34,9 +34,7 @@ namespace STamMultiplayerTestTak.Entities.Player
             Container.Bind<SpriteRenderer>().FromComponentOn(_gameObject).AsSingle();
             Container.Bind<PlayerUI>().FromComponentOn(_gameObject).AsSingle().NonLazy();
             Container.Bind<PlayerFacade>().FromComponentOn(_gameObject).AsSingle();
-
-            Container.Bind<PlayerMatchStateObserver>().FromNew().AsSingle().NonLazy();
-
+            
             Container.Bind<DamageHandler>().FromNewComponentOn(_gameObject).AsSingle().WithArguments(_gameSetup.playerHeals).NonLazy();
             Container.Bind<CoinHandler>().FromNewComponentOn(_gameObject).AsSingle().NonLazy();
             

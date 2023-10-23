@@ -4,9 +4,11 @@ using STamMultiplayerTestTak.GameClientServer;
 using STamMultiplayerTestTak.GameClientServer.Level;
 using STamMultiplayerTestTak.GameClientServer.Server;
 using STamMultiplayerTestTak.Services;
+using STamMultiplayerTestTak.UI;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Zenject;
+using Screen = STamMultiplayerTestTak.Package.UI.Screen;
 
 namespace STamMultiplayerTestTak
 {
@@ -24,7 +26,7 @@ namespace STamMultiplayerTestTak
             Container.Bind<CameraService>().FromNew().AsSingle();
             
             Container
-                .BindFactory<LevelFacade, LevelFacade.Factory>()
+                .BindFactory<ILevel, LevelFacade.Factory>()
                 .FromSubContainerResolve()
                 .ByNewContextPrefabResource(_patchToSelectedLevelPrefab)
                 ;

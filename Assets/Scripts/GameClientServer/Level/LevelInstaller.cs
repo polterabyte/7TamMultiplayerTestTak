@@ -11,14 +11,19 @@ namespace STamMultiplayerTestTak.GameClientServer.Level
         [SerializeField] private Transform coinContainer;
 
         [Inject] private GameSetup _gameSetup;
-        //private Transform _coinsParent;
 
 
         public override void InstallBindings()
         {
             Container
-                .BindFactory<Vector3, Coin, Coin.Factory>()
-                .FromMethod(Method)
+                .BindMemoryPool<Coin, Coin.MemoryPool>()
+                .FromMethod(container =>
+                {
+                    var go = PhotonNetwork.Instantiate(_gameSetup.coinPrefabName, Vector3.zero, Quaternion.identity);
+                    go.transform.SetParent(coinContainer);
+                    return container.InjectGameObjectForComponent<Coin>(go);
+                })
+                //.FromMethod(Method)
                 ;
             
             Container
@@ -26,9 +31,10 @@ namespace STamMultiplayerTestTak.GameClientServer.Level
                 .FromSubContainerResolve()
                 .ByInstaller<PlayerInstaller>()
                 ;
-            
+            Container.Bind<LevelMatchStateEventCallbackObserver>().FromNew().AsSingle().NonLazy();
+
             Container
-                .Bind<LevelFacade>()
+                .BindInterfacesTo<LevelFacade>()
                 .FromComponentOnRoot()
                 .AsSingle()
                 ;
@@ -36,7 +42,6 @@ namespace STamMultiplayerTestTak.GameClientServer.Level
         
         private Coin Method(DiContainer arg1, Vector3 arg2)
         {
-            // _coinsParent = Object.Instantiate(new GameObject(CoinsContainerName), arg1.Resolve<Transform>()).transform;
             var go = PhotonNetwork.Instantiate(_gameSetup.coinPrefabName, arg2, Quaternion.identity);
             go.transform.SetParent(coinContainer);
             return arg1.InjectGameObjectForComponent<Coin>(go);

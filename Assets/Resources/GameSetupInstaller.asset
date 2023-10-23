@@ -17,3 +17,8 @@ MonoBehaviour:
     maxPlayerInRoom: 5
     serverTimeOut: 10
     minimumPlayersForStartGame: 2
+    playerHeals: 100
+    coinsCountOnSession: 101
+    playerPrefabName: Player
+    coinPrefabName: Coin
+    bulletPrefabName: Bullet

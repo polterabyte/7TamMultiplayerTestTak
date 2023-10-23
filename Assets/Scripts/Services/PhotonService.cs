@@ -44,6 +44,17 @@ namespace STamMultiplayerTestTak.Services
                 await Task.Yield();
             }
         }
+
+        public async UniTask JoinToLobbyAsync()
+        {
+            if (!IsConnectedToServer) return;
+            
+            var breakDate = DateTime.Now + TimeSpan.FromSeconds(_gameSetup.serverTimeOut);
+            while (!PhotonNetwork.InLobby && DateTime.Now <= breakDate)
+            {
+                await Task.Yield();
+            }
+        }
         
         public async UniTask<bool> TryCreateRoomAsync(string name)
         {
@@ -91,19 +102,6 @@ namespace STamMultiplayerTestTak.Services
         public override void OnPlayerLeftRoom(Player otherPlayer)
         {
             PlayersInRooms.Remove(otherPlayer);
-        }
-
-        public GameObject InstantiatePlayer(Vector3 pos, Quaternion rot)
-        {
-            return PhotonNetwork.Instantiate(_gameSetup.playerPrefabName, pos, rot);
-        }
-        public GameObject InstantiateCoin()
-        {
-            return PhotonNetwork.Instantiate(_gameSetup.coinPrefabName, Vector3.zero, Quaternion.identity);
-        }
-        public GameObject InstantiateBullet()
-        {
-            return PhotonNetwork.Instantiate(_gameSetup.bulletPrefabName, Vector3.zero, Quaternion.identity);
         }
 
         public override void OnConnectedToMaster()

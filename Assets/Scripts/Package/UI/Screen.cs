@@ -126,13 +126,22 @@ namespace STamMultiplayerTestTak.Package.UI
             return msgBox.InOutData;
         }
 
+        public T Get<T>() where T : ISite
+        {
+            return (T)Get(typeof(T));
+        }
         public void SwitchSite<T>() where T : ISite
         {
             SwitchSite(typeof(T));
         }
+
+        public ISite Get(Type site)
+        {
+            return _sites.First(x => x.GetType() == site);
+        }
         public void SwitchSite(Type site)
         {
-            var nextSite = _sites.First(x => x.GetType() == site);
+            var nextSite = Get(site);
 
             if (_callSiteStack.TryPeek(out var pair))
             {

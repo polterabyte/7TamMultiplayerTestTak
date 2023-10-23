@@ -41,12 +41,11 @@ namespace STamMultiplayerTestTak.Entities
                 {
                     if (c.gameObject.GetComponent<DamageHandler>() != null)
                         c.gameObject.GetComponent<DamageHandler>().TakeDamage(damage);
-                    
+
                     Dispose();
                 })
                 .AddTo(ct)
                 ;
-            
         }
 
         public void Dispose()

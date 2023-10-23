@@ -28,7 +28,6 @@ namespace STamMultiplayerTestTak.Entities.Player
         [PunRPC]
         private void RPCTakeCoin(int coin)
         {
-            Debug.Log("RPCTakeCoin");
             coins = Math.Clamp(coins + coin, 0, int.MaxValue);
         }
     }

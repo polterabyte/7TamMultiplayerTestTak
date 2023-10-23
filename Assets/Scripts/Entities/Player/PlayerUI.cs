@@ -20,7 +20,7 @@ namespace STamMultiplayerTestTak.Entities.Player
         private Vector3 _offset = new(0, 165);
 
         [Inject]
-        private void Construct(CameraService cameraService, PlayerFacade player, LevelFacade levelFacade)
+        private void Construct(CameraService cameraService, PlayerFacade player, ILevel levelFacade)
         {
             healthSlider.maxValue = levelFacade.InitialPlayerHeals;
             coinSlider.maxValue = levelFacade.TargetCoins;

@@ -24,9 +24,7 @@ namespace STamMultiplayerTestTak.Services
         public UniTask ConnectedToServerAsync();
         public UniTask<bool> TryCreateRoomAsync(string name);
         public UniTask JoinToRoomAsync(string name);
-        public GameObject InstantiatePlayer(Vector3 pos, Quaternion rot);
-        public GameObject InstantiateCoin();
-        public GameObject InstantiateBullet();
+        public UniTask JoinToLobbyAsync();
 
         public static object DeserializeColor(byte[] data)
         {

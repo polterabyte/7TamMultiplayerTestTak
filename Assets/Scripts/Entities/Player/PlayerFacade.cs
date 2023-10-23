@@ -1,12 +1,7 @@
-﻿using System;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
-using ExitGames.Client.Photon;
 using Photon.Pun;
-using Photon.Realtime;
-using STamMultiplayerTestTak.GameClientServer;
 using STamMultiplayerTestTak.GameClientServer.Level;
-using STamMultiplayerTestTak.Services;
 using UnityEngine;
 using Zenject;
 
@@ -19,19 +14,20 @@ namespace STamMultiplayerTestTak.Entities.Player
         [SerializeField] public Transform gun;
         public int Healths => _damageHandler.heals;
         public int Coins => _coinHandler.coins;
-        public Color Color => _sprite.color;
-        public bool IsEnableControl { get; set; }
+        public bool IsEnableControl { get;  private set; }
+        public int ActorNum => _photonView.ControllerActorNr;
 
         private DamageHandler _damageHandler;
         private CoinHandler _coinHandler;
         private SpriteRenderer _sprite;
+        private PhotonView _photonView;
         
         private Color _initColor;
         private bool _blinkFlag;
 
         [Inject]
         private void Construct(
-            LevelFacade levelFacade,
+            ILevel level,
             SpriteRenderer spriteRenderer, 
             PhotonView photonView, 
             DamageHandler damageHandler,
@@ -42,6 +38,7 @@ namespace STamMultiplayerTestTak.Entities.Player
             _sprite = spriteRenderer;
             _damageHandler = damageHandler;
             _coinHandler = coinHandler;
+            _photonView = photonView;
             _initColor = color;
 
             _sprite.color = _initColor;
@@ -50,26 +47,21 @@ namespace STamMultiplayerTestTak.Entities.Player
                 photonView.ObservedComponents.Add(this);
 
             var ct = gameObject.GetCancellationTokenOnDestroy();
+            
+            UniTaskAsyncEnumerable
+                .EveryValueChanged(level, l => l.MatchState)
+                .Subscribe(i =>
+                {
+                    IsEnableControl = i == MatchStateEnum.Run;
+                })
+                .AddTo(ct)
+                ;
+            
             UniTaskAsyncEnumerable
                     .EveryValueChanged(this, facade => facade.Healths)
                     .Subscribe(i =>
                     {
-                        if (i > 0)
-                        {
-                            Blink();
-                            Debug.Log($"HEALS {i}");
-                        }
-                    })
-                    .AddTo(ct)
-                ;
-            UniTaskAsyncEnumerable
-                    .EveryValueChanged(this, facade => facade.Coins)
-                    .Subscribe(i =>
-                    {
-                        if (i > levelFacade.TargetCoins)
-                        {
-                            Debug.Log($"COINS {i}");
-                        }
+                        Blink();
                     })
                     .AddTo(ct)
                 ;
@@ -88,13 +80,11 @@ namespace STamMultiplayerTestTak.Entities.Player
             {
                 stream.SendNext(_coinHandler.coins);
                 stream.SendNext(_damageHandler.heals);
-                //stream.SendNext(IPhotonService.SerializeColor(_sprite.color));
             }
             else
             {
                 _coinHandler.coins = (int)stream.ReceiveNext();
                 _damageHandler.heals = (int)stream.ReceiveNext();
-                //_sprite.color = (Color)IPhotonService.DeserializeColor(stream.PeekNext());
             }
         }
         
