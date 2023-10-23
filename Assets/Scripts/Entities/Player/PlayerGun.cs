@@ -11,23 +11,21 @@ namespace STamMultiplayerTestTak.Entities.Player
 {
     public class PlayerGun : MonoBehaviour
     {
-        [SerializeField] private float reloadTimeSec = 0.5f;
-        [SerializeField] private Transform gun;
-
         private JoystickInputService _inputService;
         private Bullet.Factory _bulletFactory;
         private PhotonView _photonView;
-
+        private PlayerFacade _player;
         private bool _reloadFlag;
         
         private List<Bullet> _bullets;
 
         [Inject]
-        private void Construct(JoystickInputService joystickInputService, Bullet.Factory bulletFactory, PhotonView photonView)
+        private void Construct(JoystickInputService joystickInputService, Bullet.Factory bulletFactory, PhotonView photonView, PlayerFacade player)
         {
             _inputService = joystickInputService;
             _bulletFactory = bulletFactory;
             _photonView = photonView;
+            _player = player;
             
             _bullets = new List<Bullet>();
 
@@ -38,9 +36,9 @@ namespace STamMultiplayerTestTak.Entities.Player
 
         private void Fire()
         {
-            if (_reloadFlag) return;
+            if (_reloadFlag || !_player.IsEnableControl) return;
 
-            var bullet = _bulletFactory.Create(gun.position, transform.right);
+            var bullet = _bulletFactory.Create(_player.gun.position, transform.right);
             _bullets.Add(bullet);
 
             StartCoroutine(Reloading());
@@ -49,7 +47,7 @@ namespace STamMultiplayerTestTak.Entities.Player
         private IEnumerator Reloading()
         {
             _reloadFlag = true;
-            yield return new WaitForSeconds(reloadTimeSec);
+            yield return new WaitForSeconds(_player.reloadTimeSec);
             _reloadFlag = false;
         }
 

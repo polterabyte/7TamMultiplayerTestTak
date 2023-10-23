@@ -9,10 +9,13 @@ using Zenject;
 
 namespace STamMultiplayerTestTak.Entities
 {
+    [RequireComponent(typeof(PhotonView))]
     public class Coin : MonoBehaviour, IDisposable
     {
         private void Awake()
         {
+            if (!PhotonView.Get(gameObject).IsMine) return;
+            
             var ct = gameObject.GetCancellationTokenOnDestroy();
             gameObject
                 .GetAsyncTriggerEnter2DTrigger()
@@ -30,6 +33,9 @@ namespace STamMultiplayerTestTak.Entities
         {
             PhotonNetwork.Destroy(gameObject);
         }
+
+        
+        
         public class Factory : PlaceholderFactory<Vector3, Coin>
         { }
     }

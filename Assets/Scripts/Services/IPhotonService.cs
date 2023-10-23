@@ -13,6 +13,7 @@ namespace STamMultiplayerTestTak.Services
         {
             SerializeColor = 199,
             PlacePlayer = 198,
+            StartMatch = 197,
         }
         public bool IsMasterClient { get; }
         public bool IsConnectedToServer { get; }

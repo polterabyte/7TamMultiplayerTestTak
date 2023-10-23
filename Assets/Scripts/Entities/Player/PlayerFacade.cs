@@ -1,53 +1,57 @@
 ﻿using System;
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
+using ExitGames.Client.Photon;
 using Photon.Pun;
+using Photon.Realtime;
+using STamMultiplayerTestTak.GameClientServer;
+using STamMultiplayerTestTak.GameClientServer.Level;
+using STamMultiplayerTestTak.Services;
 using UnityEngine;
-using UnityEngine.Assertions;
 using Zenject;
 
 namespace STamMultiplayerTestTak.Entities.Player
 {
-    public class PlayerFacade : IDisposable
+    [RequireComponent(typeof(PhotonView))]
+    public class PlayerFacade : MonoBehaviour, IPunObservable
     {
-        private readonly GameSetup _gameSetup;
-        private readonly DamageHandler _damageHandler;
-        private readonly CoinHandler _coinHandler;
-        private readonly Transform _transform;
-        private readonly SpriteRenderer _spriteRenderer;
-        public int Heals => _damageHandler.heals;
+        [SerializeField] public float reloadTimeSec = 0.5f;
+        [SerializeField] public Transform gun;
+        public int Healths => _damageHandler.heals;
         public int Coins => _coinHandler.coins;
-        public Color Color
-        {
-            get => _spriteRenderer.color;
-            set => _spriteRenderer.color = value;
-        }
+        public Color Color => _sprite.color;
+        public bool IsEnableControl { get; set; }
 
-
-        private List<IDisposable> _disposables = new();
-
+        private DamageHandler _damageHandler;
+        private CoinHandler _coinHandler;
+        private SpriteRenderer _sprite;
+        
         private Color _initColor;
         private bool _blinkFlag;
 
-        public PlayerFacade(
-            GameSetup gameSetup, 
-            DamageHandler damageHandler, 
-            CoinHandler coinHandler, 
-            Transform transform, 
-            SpriteRenderer spriteRenderer
+        [Inject]
+        private void Construct(
+            LevelFacade levelFacade,
+            SpriteRenderer spriteRenderer, 
+            PhotonView photonView, 
+            DamageHandler damageHandler,
+            CoinHandler coinHandler,
+            Color color
             )
         {
-            _gameSetup = gameSetup;
+            _sprite = spriteRenderer;
             _damageHandler = damageHandler;
             _coinHandler = coinHandler;
-            _transform = transform;
-            _spriteRenderer = spriteRenderer;
-            
-            _initColor = _spriteRenderer.color;
+            _initColor = color;
 
-            var a = UniTaskAsyncEnumerable
-                    .EveryValueChanged(this, facade => facade.Heals)
+            _sprite.color = _initColor;
+            
+            if (!photonView.ObservedComponents.Contains(this))
+                photonView.ObservedComponents.Add(this);
+
+            var ct = gameObject.GetCancellationTokenOnDestroy();
+            UniTaskAsyncEnumerable
+                    .EveryValueChanged(this, facade => facade.Healths)
                     .Subscribe(i =>
                     {
                         if (i > 0)
@@ -56,36 +60,49 @@ namespace STamMultiplayerTestTak.Entities.Player
                             Debug.Log($"HEALS {i}");
                         }
                     })
+                    .AddTo(ct)
                 ;
-            var b = UniTaskAsyncEnumerable
+            UniTaskAsyncEnumerable
                     .EveryValueChanged(this, facade => facade.Coins)
                     .Subscribe(i =>
                     {
-                        // TODO !!!!!
-                        if (i > _gameSetup.coinsCountOnSession)
+                        if (i > levelFacade.TargetCoins)
                         {
                             Debug.Log($"COINS {i}");
                         }
                     })
+                    .AddTo(ct)
                 ;
-
-            _disposables.AddRange(new[] { a, b });
-        }
-
-        private async void Blink()
-        {
-            _spriteRenderer.color = Color.red;
-            await UniTask.Delay(300);
-            _spriteRenderer.color = _initColor;
-        }
-
-        public void Dispose()
-        {
-            _disposables.ForEach(x=> x.Dispose());
-            PhotonNetwork.Destroy(_transform.gameObject);
         }
         
-        public class Factory : PlaceholderFactory<GameObject, PlayerFacade>
+        private async void Blink()
+        {
+            _sprite.color = Color.red;
+            await UniTask.Delay(300);
+            _sprite.color = _initColor;
+        }
+        
+        public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+        {
+            if (stream.IsWriting)
+            {
+                stream.SendNext(_coinHandler.coins);
+                stream.SendNext(_damageHandler.heals);
+                //stream.SendNext(IPhotonService.SerializeColor(_sprite.color));
+            }
+            else
+            {
+                _coinHandler.coins = (int)stream.ReceiveNext();
+                _damageHandler.heals = (int)stream.ReceiveNext();
+                //_sprite.color = (Color)IPhotonService.DeserializeColor(stream.PeekNext());
+            }
+        }
+        
+        /// <summary>
+        /// GameObject - префаб
+        /// bool - локальныый
+        /// </summary>
+        public class Factory : PlaceholderFactory<GameObject, bool, Color, PlayerFacade>
         {
         }
     }

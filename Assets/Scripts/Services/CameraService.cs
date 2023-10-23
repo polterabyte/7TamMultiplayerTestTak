@@ -4,16 +4,16 @@ namespace STamMultiplayerTestTak.Services
 {
     public class CameraService
     {
-        private Camera _camera;
+        public readonly Camera Camera;
         
         public CameraService()
         {
-            _camera = Camera.main;
+            Camera = Camera.main;
         }
 
         public bool CheckVisibility(Vector3 position)
         {
-            var viewPos = _camera.WorldToViewportPoint(position);
+            var viewPos = Camera.WorldToViewportPoint(position);
             return viewPos.x is >= 0 and <= 1 && 
                    viewPos.y is >= 0 and <= 1 && 
                    viewPos.z > 0;
@@ -21,7 +21,12 @@ namespace STamMultiplayerTestTak.Services
 
         public Vector2 GetViewportRect()
         {
-            return _camera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height,0));
+            return Camera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height,0));
+        }
+
+        public Vector3 WorldToScreenPoint(Vector3 worldPos)
+        {
+            return Camera.WorldToScreenPoint(worldPos);
         }
     }
 }

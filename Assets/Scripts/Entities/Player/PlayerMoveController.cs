@@ -17,7 +17,7 @@ namespace STamMultiplayerTestTak.Entities.Player
         private PhotonView _photonView;
 
         [Inject]
-        private void Construct(JoystickInputService joystickInputService, PhotonView photonView, Rigidbody2D rigidbody2D)
+        private void Construct(JoystickInputService joystickInputService, PhotonView photonView, Rigidbody2D rigidbody2D, PlayerFacade player)
         {
             _inputService = joystickInputService;
             _photonView = photonView;
@@ -29,6 +29,8 @@ namespace STamMultiplayerTestTak.Entities.Player
                 .GetAsyncUpdateTrigger()
                 .Subscribe(_ =>
                 {
+                    if (!player.IsEnableControl) return;
+                    
                     var v = _inputService.Vertical;
                     var h = _inputService.Horizontal;
                     var dir = new Vector2() { x = transform.right.x, y = transform.right.y };

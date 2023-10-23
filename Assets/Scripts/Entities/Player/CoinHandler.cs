@@ -1,17 +1,35 @@
 ﻿using System;
+using Photon.Pun;
 using UnityEngine;
+using Zenject;
 
 namespace STamMultiplayerTestTak.Entities.Player
 {
+    [RequireComponent(typeof(PhotonView))]
     public class CoinHandler : MonoBehaviour
     {
         public int coins;
 
-        public void TakeCoin(int coin)
+        private PhotonView _photonView;
+
+        private void Awake()
         {
-            coins = Math.Clamp(coins + coin, 0, int.MaxValue);
+            _photonView = PhotonView.Get(gameObject);
         }
 
-
+        public void TakeCoin(int coin)
+        {
+            if (_photonView.IsMine)
+                RPCTakeCoin(coin);
+            else
+                _photonView.RPC(nameof(RPCTakeCoin), RpcTarget.Others, coin);
+        }
+        
+        [PunRPC]
+        private void RPCTakeCoin(int coin)
+        {
+            Debug.Log("RPCTakeCoin");
+            coins = Math.Clamp(coins + coin, 0, int.MaxValue);
+        }
     }
 }
